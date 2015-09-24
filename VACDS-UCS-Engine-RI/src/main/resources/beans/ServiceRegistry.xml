@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+
+	<!-- Test SMS Adapter -->
+	<bean id="testSMSAdapter" name="testSMSAdapter"
+		class="org.socraticgrid.hl7.services.uc.adapters.proxies.SOAPProxyAdapter"
+		scope="singleton">
+		<property name="serviceName" value="testSMS" />
+		<!-- The endpoint should be configured by the Spring configurator -->
+	</bean>
+
+
+	<!-- SMS Adapter -->
+	<bean id="SMSAdapter" name="SMSAdapter"
+		class="org.socraticgrid.hl7.services.uc.adapters.proxies.SOAPProxyAdapter"
+		scope="singleton">
+		<property name="serviceName" value="SMS" />
+		<!-- The endpoint should be configured by the Spring configurator -->
+	</bean>
+
+	<!-- TextToVoice Adapter -->
+	<bean id="TTVAdapter" name="TTVAdapter"
+		class="org.socraticgrid.hl7.services.uc.adapters.proxies.SOAPProxyAdapter"
+		scope="singleton">
+		<property name="serviceName" value="TTV" />
+		<!-- The endpoint should be configured by the Spring configurator -->
+	</bean>
+
+	<bean id="TestRegistry" name="TestRegistry"
+		class="org.socraticgrid.hl7.services.uc.functional.ServiceRegistry"
+		scope="singleton" primary="true">
+		<!-- The Server Id is currently set here and should be moved -->
+		<property name="serverId" value="UCSTestServer"></property>
+		<property name="adapterMap">
+			<map>
+				<entry key="test">
+					<bean class="org.socraticgrid.hl7.services.uc.adapters.test.TestAdapter" />
+				</entry>
+				<entry key="Alert">
+					<bean id="MainAlertAdapter" name="MainAlertAdapter"
+						class="org.socraticgrid.hl7.services.uc.adapters.alerting.AlertingAdapter"
+						scope="singleton">
+						<property name="configuration">
+							<bean
+								class="org.socraticgrid.hl7.services.uc.adapters.alerting.Configuration">
+								<property name="serviceId" value="Alerts"></property>
+								<property name="requireAliasUse" value="false"></property>
+								<property name="requireSecureEndpoint" value="false"></property>
+								<property name="endpointMap">
+									<map>
+										<entry key="MyAlias" value="https://www.myendpoint.com/alerts" />
+									</map>
+								</property>
+							</bean>
+						</property>
+						<property name="Adapter" ref="AdapterServiceImpl" />
+					</bean>
+				</entry>
+				<entry key="testSMS">
+					<ref bean="testSMSAdapter" />
+				</entry>
+				<entry key="SMS">
+					<ref bean="SMSAdapter" />
+				</entry>
+				<entry key="TTV">
+					<ref bean="TTVAdapter" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+
+</beans>

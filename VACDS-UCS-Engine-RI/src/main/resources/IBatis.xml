@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+
+<configuration>
+
+	<properties>
+	</properties>
+
+	<!-- settings>
+		<setting name="callSettersOnNulls" value="true"/>
+	</settings-->
+
+	<typeAliases>
+		<typeAlias type="org.socraticgrid.hl7.services.uc.exceptions.ProcessingException" alias="ProcessingException"/>
+		<typeAlias type="org.socraticgrid.hl7.services.uc.model.AddressPersistenceAdapter" alias="AddressPersistenceAdapter"/>
+		<typeAlias type="org.socraticgrid.hl7.services.uc.model.Conversation" alias="Conversation"/>
+		<typeAlias type="org.socraticgrid.hl7.services.uc.model.ConversationChannel" alias="ConversationChannel"/>
+		<typeAlias type="org.socraticgrid.hl7.services.uc.model.DeliveryAddress" alias="DeliveryAddress"/>
+		<typeAlias type="org.socraticgrid.hl7.services.uc.model.MessageBody" alias="MessageBody"/>
+		<typeAlias type="org.socraticgrid.hl7.services.uc.model.MessageBodyExceptionsDelegate" alias="MessageBodyExceptionsDelegate"/>
+		<typeAlias type="org.socraticgrid.hl7.services.uc.model.MessageHeader" alias="MessageHeader"/>
+		<typeAlias type="org.socraticgrid.hl7.services.uc.model.MessageHeaderPersistenceAdapter" alias="MessageHeaderPersistenceAdapter"/>
+		<typeAlias type="org.socraticgrid.hl7.services.uc.model.PhysicalAddress" alias="PhysicalAddress"/>
+		<typeAlias type="org.socraticgrid.hl7.services.uc.model.Recipient" alias="Recipient"/>
+		<typeAlias type="org.socraticgrid.hl7.services.uc.model.SimpleMessage" alias="SimpleMessage"/>
+		<typeAlias type="org.socraticgrid.hl7.services.uc.model.SimpleMessageHeader" alias="SimpleMessageHeader"/>
+		<typeAlias type="org.socraticgrid.hl7.services.uc.model.StatusByReceiverDelegate" alias="StatusByReceiverDelegate"/>
+		<typeAlias type="org.socraticgrid.hl7.services.uc.model.UserContactInfo" alias="UserContactInfo"/>
+		<typeAlias type="org.socraticgrid.hl7.services.uc.model.UserContactInfoDelegate" alias="UserContactInfoDelegate"/>
+	</typeAliases>
+
+	<typeHandlers>
+		<typeHandler handler="org.socraticgrid.hl7.services.uc.db.dto.typehandler.PropertiesHandler" />
+		<typeHandler handler="org.socraticgrid.hl7.services.uc.db.dto.typehandler.MessageTypeHandler" />
+		<typeHandler handler="org.socraticgrid.hl7.services.uc.db.dto.typehandler.AddressTypeHandler" />
+		<typeHandler handler="org.socraticgrid.hl7.services.uc.db.dto.typehandler.RoleHandler" />
+		<typeHandler handler="org.socraticgrid.hl7.services.uc.db.dto.typehandler.DeliveryGuaranteeHandler" />
+		<typeHandler handler="org.socraticgrid.hl7.services.uc.db.dto.typehandler.MessageDynamicsHandler" />
+		<typeHandler handler="org.socraticgrid.hl7.services.uc.db.dto.typehandler.AlertStatusHandler" />
+		<typeHandler handler="org.socraticgrid.hl7.services.uc.db.dto.typehandler.ExceptionTypeHandler" />
+	</typeHandlers>
+
+	<environments default="local-derby">
+		<!-- A default Derby deployment - optionally creates local_db/derby in 
+			KMF Properties -->
+		<environment id="test">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="org.apache.derby.jdbc.ClientDriver" />
+				<property name="url"
+					value="jdbc:derby://localhost/memory:VACDS;create=true" />
+				<property name="username" value="UCOMM" />
+			</dataSource>
+		</environment>
+		<environment id="local-derby">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="org.apache.derby.jdbc.EmbeddedDriver" />
+				<property name="url"
+					value="jdbc:derby:local_db/derby/VACDS" />
+				<property name="username" value="UCOMM" />
+			</dataSource>
+		</environment>
+		<!-- Shared Development database -->
+		<environment id="dev">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="org.apache.derby.jdbc.ClientDriver" />
+				<property name="url" value="jdbc:derby://172.31.5.32:1527//opt/UCOMM" />
+				<property name="username" value="UCOMM" />
+				<property name="password" value="C0gnitive!" />
+			</dataSource>
+		</environment>
+	</environments>
+
+	<mappers>
+		<mapper resource="maps/org.socraticgrid.hl7.services.uc.db.AddressPersistenceAdapter.xml" />
+		<mapper resource="maps/org.socraticgrid.hl7.services.uc.db.DeliveryAddress.xml" />
+		<mapper resource="maps/org.socraticgrid.hl7.services.uc.db.Message.xml" />
+		<mapper resource="maps/org.socraticgrid.hl7.services.uc.db.MessageBody.xml" />
+		<mapper resource="maps/org.socraticgrid.hl7.services.uc.db.ProcessingException.xml" />
+		<mapper resource="maps/org.socraticgrid.hl7.services.uc.db.Recipient.xml" />
+		<mapper resource="maps/org.socraticgrid.hl7.services.uc.db.MessageHeaderPersistenceAdapter.xml" />
+		<mapper resource="maps/org.socraticgrid.hl7.services.uc.db.MessageHeaderJoinRecipient.xml" />
+		<mapper resource="maps/org.socraticgrid.hl7.services.uc.db.MessageHeaderAlertStatusJoinDeliveryAddress.xml" />
+		<mapper resource="maps/org.socraticgrid.hl7.services.uc.db.MessageJoinMessageBody.xml" />
+		<mapper resource="maps/org.socraticgrid.hl7.services.uc.db.MessageJoinProcessingException.xml" />
+		<mapper resource="maps/org.socraticgrid.hl7.services.uc.db.UserContactInfo.xml" />
+		<mapper resource="maps/org.socraticgrid.hl7.services.uc.db.UserContactInfoJoinAddress.xml" />
+		<mapper resource="maps/org.socraticgrid.hl7.services.uc.db.Conversation.xml" />
+		<mapper resource="maps/org.socraticgrid.hl7.services.uc.db.ConversationChannel.xml" />
+		<mapper resource="maps/org.socraticgrid.hl7.services.uc.db.ConversationJoinConversationChannel.xml" />
+		<mapper resource="maps/org.socraticgrid.hl7.services.uc.db.ConversationJoinParticipant.xml" />
+		<mapper resource="maps/org.socraticgrid.hl7.services.uc.db.MessageHeaderJoinSender.xml" />
+	</mappers>
+
+</configuration>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<import resource="classpath:beans/AddressResolver.xml" />
+	<import resource="classpath:beans/ConversationManager.xml" />
+	<import resource="classpath:beans/DeliveryManager.xml" />
+	<import resource="classpath:beans/EventLogger.xml" />
+	<import resource="classpath:beans/GroupManager.xml" />
+	<import resource="classpath:beans/MessageIdGenerator.xml" />
+	<import resource="classpath:beans/MessageManager.xml" />
+	<import resource="classpath:beans/MessageValidator.xml" />
+	<import resource="classpath:beans/ServiceRegistry.xml" />
+	<import resource="classpath:beans/UserManager.xml" />
+	<import resource="classpath:beans/WorkflowManager.xml" />
+	<import resource="classpath:beans/Configurator.xml" />
+	<import resource="classpath:beans/ClientRegistry.xml" />
+</beans>

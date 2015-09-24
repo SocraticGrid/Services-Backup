@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.socraticgrid.hl7.services.uc.db.Conversation">
+
+	<select id="selectConversationById" parameterType="java.lang.String"
+	    resultMap="conversationResultMap">
+		SELECT 
+		c.conversation_id AS c_conversationId
+		, cc.conversation_channel_id AS cc_conversationChannelId
+		, ucicc.user_contact_info_id AS ucicc_userContactInfoId
+		, ucicc.name AS ucicc_name
+		, ucicc.endpoint AS ucicc_endpoint
+		, uciccp.address_id AS uciccp_addressId
+		, uciccp.address_type AS uciccp_addressType
+		, uciccp.address AS uciccp_address
+		, uciccp.service_id AS uciccp_serviceId
+		, COALESCE(cucija.type,'') AS cucija_type
+		, uciccp.name AS uciccp_name
+		, ucicca.address_id AS ucicca_addressId
+		, ucicca.address_type AS ucicca_addressType
+		, ucicca.address AS ucicca_address
+		, ucicca.service_id AS ucicca_serviceId
+		, ucicca.name AS ucicca_name
+		, participantDa.delivery_address_id AS participantDa_deliveryAddressId
+		, participantA.address_id AS participantA_addressId
+		, participantA.address_type AS participantA_addressType
+		, participantA.address AS participantA_address
+		, participantA.service_id AS participantA_serviceId
+		, participantA.name AS participantA_name
+		FROM conversation c
+		<!-- CONVERSATION CHANNELS -->
+		LEFT JOIN conversation_join_conversation_channel cjcc ON cjcc.conversation_id = c.conversation_id AND cjcc.deleted = 0
+		LEFT JOIN conversation_channel cc ON cc.conversation_channel_id = cjcc.conversation_channel_id AND cc.deleted = 0
+		<!-- OWNER -->
+		LEFT JOIN user_contact_info ucicc ON ucicc.user_contact_info_id = c.owner_id AND ucicc.deleted = 0
+		LEFT JOIN address uciccp ON uciccp.address_id = ucicc.preferred_address_id AND uciccp.deleted = 0
+		LEFT JOIN user_contact_info_join_address cucija ON cucija.user_contact_info_id = ucicc.user_contact_info_id
+			AND cucija.deleted = 0
+		LEFT JOIN address ucicca ON ucicca.address_id = cucija.address_id AND ucicca.deleted = 0
+		<!-- PARTICIPANTS -->
+		LEFT JOIN conversation_join_participant cjp ON cjp.conversation_id = c.conversation_id AND cjp.deleted = 0
+		LEFT JOIN delivery_address participantDa ON participantDa.delivery_address_id = cjp.delivery_address_id 
+			AND participantDa.deleted = 0
+		LEFT JOIN address participantA ON participantA.address_id = participantDa.address_id AND participantA.deleted = 0
+
+    	WHERE c.conversation_id = #{conversationId:VARCHAR}
+    		AND c.deleted = 0
+	</select>
+	
+	<insert id="insertConversation" parameterType="Conversation">
+	    INSERT INTO conversation (conversation_id, owner_id)
+	    VALUES( #{conversationId:VARCHAR}, #{ownerId:VARCHAR} )
+	</insert>
+	
+	<update id="updateConversation" parameterType="Conversation">
+	    UPDATE conversation
+	    	SET owner_id = #{ownerId:VARCHAR}
+	    WHERE conversation_id = #{conversationId:VARCHAR}
+	</update>
+	
+	<update id="deleteConversation" parameterType="java.lang.String">
+	    UPDATE conversation
+	    	SET deleted = 1
+	    WHERE conversation_id = #{conversationId:VARCHAR}
+	</update>
+	
+		
+	<resultMap id="conversationResultMap" type="Conversation">
+		<id property="conversationId" column="c_conversationId" />
+		<association property="owner" column="ucicc_userContactInfoId" javaType="UserContactInfoDelegate"
+			resultMap="org.socraticgrid.hl7.services.uc.db.UserContactInfo.conv_userContactInfoResultMap" />
+		<collection property="channels" ofType="ConversationChannel"
+			resultMap="org.socraticgrid.hl7.services.uc.db.ConversationChannel.conversationChannelResultMap" />
+		<collection property="participants" ofType="DeliveryAddress" 
+			resultMap="org.socraticgrid.hl7.services.uc.db.DeliveryAddress.convP_deliveryAddressResultMap" />
+	</resultMap>
+	
+	
+</mapper>

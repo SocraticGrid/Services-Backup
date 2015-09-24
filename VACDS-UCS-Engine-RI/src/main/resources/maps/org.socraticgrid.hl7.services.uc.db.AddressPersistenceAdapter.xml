@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.socraticgrid.hl7.services.uc.db.AddressPersistenceAdapter">
+
+	<select id="selectAddressById" parameterType="java.lang.String"
+	    resultMap="addressResultMap">
+		SELECT 
+		a.address_id AS a_addressId
+		, a.address_type AS a_addressType
+		, a.address AS a_address
+		, a.service_id AS a_serviceId
+		, a.name AS a_name
+		FROM address a
+    	WHERE a.address_id = #{addressId:VARCHAR}
+    		AND a.deleted = 0
+	</select>
+	
+	<insert id="insertAddress" parameterType="AddressPersistenceAdapter">
+	    INSERT INTO address (address_id, address_type, address, service_id, name)
+	    VALUES(#{addressId:VARCHAR}, #{addressType:VARCHAR}, #{address:VARCHAR}, #{serviceId:VARCHAR}, #{name:VARCHAR})
+	</insert>
+	
+	<update id="updateAddress" parameterType="AddressPersistenceAdapter">
+	    UPDATE address
+	    	SET address_type = #{addressType:VARCHAR} 
+	    	, address = #{address:VARCHAR}
+	    	, service_id = #{serviceId:VARCHAR}
+	    	, name = #{name:VARCHAR}
+	    WHERE address_id = #{addressId:VARCHAR}
+	</update>
+	
+	<update id="deleteAddress" parameterType="java.lang.String">
+	    UPDATE address
+	    	SET deleted = 1
+	    WHERE address_id = #{addressId:VARCHAR}
+	</update>
+	
+	
+	<resultMap id="addressResultMap" type="AddressPersistenceAdapter">
+		<id property="addressId" column="a_addressId" />
+		<result property="addressType" column="a_addressType" />
+		<result property="serviceId" column="a_serviceId" />
+		<result property="address" column="a_address" />
+		<result property="name" column="a_name" />
+	</resultMap>
+
+	<resultMap id="senderAddressResultMap" type="AddressPersistenceAdapter">
+		<id property="addressId" column="sendera_addressId" />
+		<result property="addressType" column="sendera_addressType" />
+		<result property="serviceId" column="sendera_serviceId" />
+		<result property="address" column="sendera_address" />
+		<result property="name" column="sendera_name" />
+	</resultMap>
+		
+	<resultMap id="ucipAddressResultMap" type="AddressPersistenceAdapter">
+		<id property="addressId" column="ucip_addressId" />
+		<result property="addressType" column="ucip_addressType" />
+		<result property="serviceId" column="ucip_serviceId" />
+		<result property="address" column="ucip_address" />
+		<result property="name" column="ucip_name" />
+	</resultMap>
+	
+	<resultMap id="uciaAddressResultMap" type="AddressPersistenceAdapter">
+		<id property="addressId" column="ucia_addressId" />
+		<result property="addressType" column="ucia_addressType" />
+		<result property="serviceId" column="ucia_serviceId" />
+		<result property="address" column="ucia_address" />
+		<result property="name" column="ucia_name" />
+	</resultMap>
+		
+	<resultMap id="vis_addressResultMap" type="AddressPersistenceAdapter">
+		<id property="addressId" column="visA_addressId" />
+		<result property="addressType" column="visA_addressType" />
+		<result property="serviceId" column="visA_serviceId" />
+		<result property="address" column="visA_address" />
+		<result property="name" column="visA_name" />
+	</resultMap>
+		
+	<!-- ******************************** PhysicalAddress variant -->
+	<!-- The following two resulMaps are used exclusively by UserContactInfo
+		and are kept here so all address resultMaps have the same origin -->
+	<resultMap id="conv_ucipAddressResultMap" type="PhysicalAddress">
+		<id property="addressId" column="uciccp_addressId" />
+		<result property="serviceId" column="uciccp_serviceId" />
+		<result property="address" column="uciccp_address" />
+	</resultMap>
+	<resultMap id="conv_uciaAddressResultMap" type="PhysicalAddress">
+		<id property="addressId" column="ucicca_addressId" />
+		<result property="serviceId" column="ucicca_serviceId" />
+		<result property="address" column="ucicca_address" />
+	</resultMap>
+	<!-- ******************************** -->
+
+	<!-- ******************************** Conversation Participants variant -->
+	<!-- The following resulMaps is used exclusively by Conversation
+		and are kept here so all address resultMaps have the same origin -->
+	<resultMap id="convP_addressResultMap" type="AddressPersistenceAdapter">
+		<id property="addressId" column="participantA_addressId" />
+		<result property="addressType" column="participantA_addressType" />
+		<result property="serviceId" column="participantA_serviceId" />
+		<result property="address" column="participantA_address" />
+		<result property="name" column="participantA_name" />
+	</resultMap>
+	<!-- ******************************** -->
+
+</mapper>

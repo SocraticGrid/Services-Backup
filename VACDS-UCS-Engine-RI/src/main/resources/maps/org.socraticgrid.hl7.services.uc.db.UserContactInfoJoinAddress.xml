@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.socraticgrid.hl7.services.uc.db.UserContactInfoJoinAddress">
+
+	<insert id="insertUserContactInfoJoinAddress" parameterType="java.util.Map">
+	    INSERT INTO user_contact_info_join_address (user_contact_info_id, address_id, type)
+	    VALUES(#{userContactInfoId}, #{addressId:VARCHAR}, #{type:VARCHAR})
+	</insert>
+	
+	<delete id="deleteForUserContactInfoId" parameterType="java.lang.String">
+	    DELETE FROM user_contact_info_join_address ucija
+	    WHERE ucija.user_contact_info_id = #{userContactInfoId:VARCHAR}
+	</delete>
+	
+	<delete id="deleteForUserContactInfoJoinAddressId" parameterType="java.lang.String">
+	    DELETE FROM user_contact_info_join_address
+	    WHERE user_contact_info_join_address.address_id = #{addressId:VARCHAR}
+	</delete>
+	
+</mapper>

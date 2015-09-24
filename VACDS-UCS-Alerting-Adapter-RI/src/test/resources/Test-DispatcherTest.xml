@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="Adapter" class="org.mockito.Mockito" factory-method="mock"> 
+    	<constructor-arg value="org.socraticgrid.hl7.services.uc.interfaces.AdapterIntf" /> 
+	</bean> 
+	
+	<bean id="SEI" class="org.mockito.Mockito" factory-method="mock"> 
+    	<constructor-arg value="org.socraticgrid.hl7.services.ucs.accessclients.ucsalerting.UCSAlertingServiceSEI" /> 
+	</bean>
+
+	<bean id="SE" class="org.mockito.Mockito" factory-method="mock"> 
+    	<constructor-arg value="org.socraticgrid.hl7.services.ucs.accessclients.ucsalerting.UCSAlertingServiceSE" /> 
+	</bean> 
+	
+	<bean id="RequestMap" class="org.mockito.Mockito" factory-method="mock"> 
+    	<constructor-arg value="java.util.Map" /> 
+	</bean> 
+	
+	<bean id="DispatcherImpl" name="DispatcherImpl"
+		class="org.socraticgrid.hl7.services.uc.adapters.alerting.Dispatcher">
+		<property name="Configuration" ref="Configuration"></property>
+	</bean>
+	
+	<bean id="AddressResolverImpl" name="AddressResolverImpl"
+		class="org.socraticgrid.hl7.services.uc.adapters.alerting.AddressResolver">
+	</bean>
+	
+	
+	<bean id="Configuration" name="Configuration"
+		class="org.socraticgrid.hl7.services.uc.adapters.alerting.Configuration">
+		<property name="EndpointMap">
+			<map>
+			<entry key="MyAlias" value="http://www.somewhere.com/ucsalerting"/>
+			</map>
+		</property>
+	</bean>
+	<bean id="MockSEI" name="MockSEI"
+		class="org.socraticgrid.hl7.services.uc.adapters.alerting.MockSEI">
+		<property name="RequestContext" ref="RequestMap"></property>
+	</bean>
+	
+	
+</beans>

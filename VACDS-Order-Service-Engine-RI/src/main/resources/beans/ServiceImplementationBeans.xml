@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!--  Service Implementation -->
+	<import resource="classpath:beans/OrderManagementServiceImpl.xml" />
+	<import resource="classpath:beans/OrderMonitoringServiceImpl.xml" />
+	<import resource="classpath:beans/OrderWorkflowServiceImpl.xml" />
+	<import resource="classpath:beans/OrderCatalogQueryServiceImpl.xml" />
+	<import resource="classpath:beans/FulfillmentUpdateServiceImpl.xml" />
+	<import resource="classpath:beans/Configurator.xml" />
+	
+	
+</beans>

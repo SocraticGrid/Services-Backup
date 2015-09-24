@@ -1,0 +1,347 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.socraticgrid.hl7</groupId>
+	<artifactId>UCSAlertingLib</artifactId>
+	<version>0.0.13-RELEASE</version>
+	<packaging>jar</packaging>
+
+	<properties>
+
+		<!-- Generic properties -->
+		<java.version>1.7</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+		<!-- Web -->
+		<jsp.version>2.2</jsp.version>
+		<jstl.version>1.2</jstl.version>
+		<servlet.version>2.5</servlet.version>
+
+		<cxf.version>2.7.8</cxf.version>
+
+		<!-- Spring -->
+		<spring.version>3.2.3.RELEASE</spring.version>
+
+		<!-- Logging -->
+		<logback.version>1.0.13</logback.version>
+		<slf4j.version>1.7.5</slf4j.version>
+
+		<!-- Test -->
+		<junit.version>4.11</junit.version>
+
+	</properties>
+
+	<dependencies>
+
+		<!-- SPRING -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+
+		<!-- CXF -->
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-frontend-jaxws</artifactId>
+			<version>${cxf.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-transports-http</artifactId>
+			<version>${cxf.version}</version>
+		</dependency>
+
+		<!-- MYBATIS -->
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+			<version>3.0.1</version>
+		</dependency>
+
+		<!-- Test Artifacts -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${spring.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- SLF4J - Log4J -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.5</version>
+		</dependency>
+
+		<!-- Mockito -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.5</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.socraticgrid.hl7</groupId>
+			<artifactId>UCSModel</artifactId>
+			<version>0.0.13-RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.socraticgrid.hl7</groupId>
+			<artifactId>UCSAlerting</artifactId>
+			<version>0.0.13-RELEASE</version>
+			<type>wsdl</type>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>UCSAlertingLib</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+			<!-- extract WSDL and XSD from dependency jar -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.8</version>
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.socraticgrid.hl7</groupId>
+									<artifactId>UCSAlerting</artifactId>
+									<version>0.0.13-RELEASE</version>
+									<type>wsdl</type>
+									<overWrite>true</overWrite>
+									<outputDirectory>src/main/resources/wsdl</outputDirectory>
+									<destFileName>UCSAlerting.wsdl</destFileName>
+								</artifactItem>
+							</artifactItems>
+							<!--<OutDirectory>${project.build.directory}/wars</outputDirectory> -->
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- <plugin> <groupId>org.apache.cxf</groupId> <artifactId>cxf-codegen-plugin</artifactId> 
+				<version>${cxf.version}</version> <executions> <execution> <id>generate-sources</id> 
+				<phase>generate-sources</phase> <configuration> <sourceRoot>${project.build.directory}/generated/cxf</sourceRoot> 
+				<wsdlOptions> <wsdlOption> <wsdlArtifact> <groupId>org.socraticgrid.hl7</groupId> 
+				<artifactId>UCSClient</artifactId> <version>0.0.3-SNAPSHOT</version> </wsdlArtifact> 
+				<extraargs> <extraarg>-client</extraarg> <extraarg>-verbose</extraarg> <extraarg>-p</extraarg> 
+				<extraarg>http://org.socraticgrid.hl7.services.uc.model=org.socraticgrid.hl7.services.uc.model</extraarg> 
+				<extraarg>-p</extraarg> <extraarg>http://org.socraticgrid.hl7.services.uc.exceptions=org.socraticgrid.hl7.services.uc.exceptions</extraarg> 
+				<extraarg>-p</extraarg> <extraarg>org.socraticgrid.hl7.services.uc.clients.ucsclient</extraarg> 
+				</extraargs> </wsdlOption> </wsdlOptions> </configuration> <goals> <goal>wsdl2java</goal> 
+				</goals> </execution> </executions> <dependencies> <dependency> <groupId>org.jvnet.jaxb2_commons</groupId> 
+				<artifactId>jaxb2-basics</artifactId> <version>0.6.5</version> </dependency> 
+				</dependencies> </plugin> -->
+			<!-- <plugin> <groupId>org.apache.cxf</groupId> <artifactId>cxf-java2ws-plugin</artifactId> 
+				<version>${cxf.version}</version> <dependencies> <dependency> <groupId>org.apache.cxf</groupId> 
+				<artifactId>cxf-rt-frontend-jaxws</artifactId> <version>${cxf.version}</version> 
+				</dependency> <dependency> <groupId>org.apache.cxf</groupId> <artifactId>cxf-rt-frontend-simple</artifactId> 
+				<version>${cxf.version}</version> </dependency> </dependencies> <executions> 
+				<execution> <id>UCSClientService</id> <phase>process-classes</phase> <configuration> 
+				<className>org.socraticgrid.hl7.services.uc.clients.ucsclient.UCSClientService</className> 
+				<genWsdl>true</genWsdl> <verbose>true</verbose> </configuration> <goals> 
+				<goal>java2ws</goal> </goals> </execution> </executions> </plugin> -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.16</version>
+				<configuration>
+					<systemProperties>
+						<property>
+							<name>java.util.logging.config.file</name>
+							<value>src/test/resources/log4j.properties</value>
+						</property>
+					</systemProperties>
+					<!-- <parallel>methods</parallel> <threadCount>10</threadCount> -->
+					<excludes>
+						<exclude>**/IT*.java</exclude>
+						<exclude>**/*IT.java</exclude>
+						<exclude>**/*ITCase.java</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+			<!-- Integration Test Support -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<id>add-it-source</id>
+						<goals>
+							<goal>add-test-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>src/it/java</source>
+							</sources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>add-it-resource</id>
+						<goals>
+							<goal>add-test-resource</goal>
+						</goals>
+						<configuration>
+							<resources>
+								<resource>
+									<directory>src/it/resources</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.16</version>
+				<configuration>
+					<!--- Not used <junitArtifactName>org.junit.:com.springsource.org.junit</junitArtifactName> -->
+					<systemProperties>
+						<property>
+							<name>java.util.logging.config.file</name>
+							<value>src/it/resources/log4j.properties</value>
+						</property>
+					</systemProperties>
+				</configuration>
+				<executions>
+					<execution>
+						<id>integration-test</id>
+						<goals>
+							<goal>integration-test</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>verify</id>
+						<goals>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.cxf
+										</groupId>
+										<artifactId>
+											cxf-java2ws-plugin
+										</artifactId>
+										<versionRange>
+											[2.7.7,)
+										</versionRange>
+										<goals>
+											<goal>java2ws</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute></execute>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-dependency-plugin
+										</artifactId>
+										<versionRange>
+											[2.8,)
+										</versionRange>
+										<goals>
+											<goal>copy</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+				<plugin>
+					<artifactId>maven-clean-plugin</artifactId>
+					<version>2.5</version>
+					<configuration>
+						<filesets>
+							<fileset>
+								<directory>src/main/resources/wsdl</directory>
+								<includes>
+									<include>**/*.wsdl</include>
+								</includes>
+								<followSymlinks>false</followSymlinks>
+							</fileset>
+						</filesets>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>

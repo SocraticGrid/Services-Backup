@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean name="InternalSubscription" id="InternalSubscription"
+		class="org.socraticgrid.hl7.services.eps.model.Subscription">
+		<property name="type" value="Push" />
+		<property name="durability" value="Transient"></property>
+		<property name="subscriberNotificationAddress">
+			<bean class="org.socraticgrid.hl7.services.eps.model.NotificationAddress">
+				<property name="endpoint" value="http://localhost/invalid" />
+				<property name="type" value="URI" />
+			</bean>
+		</property>
+		<property name="subscriber" ref="TestUser" />
+	</bean>
+</beans>

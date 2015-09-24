@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.socraticgrid.hl7.services.uc.db.Recipient">
+
+	<select id="selectRecipientById" parameterType="java.lang.String"
+	    resultType="Recipient">
+		SELECT 
+		r.recipient_id AS recipientId
+		, r.delivery_address_id AS deliveryAddressId
+		, r.delivery_receipt AS deliveryReceipt
+		, r.read_receipt AS readReceipt
+		, r.role AS role
+		, r.visibility AS visibility
+		, da.delivery_address_id AS da_deliveryAddressId
+		, a.address_id AS a_addressId
+		, a.address_type AS a_addressType
+		, a.address AS a_address
+		, a.service_id AS a_serviceId
+		, a.name AS a_name
+		FROM recipient r
+		LEFT JOIN delivery_address da ON da.delivery_address_id = r.delivery_address_id AND da.deleted = 0
+		LEFT JOIN address a ON a.address_id = da.address_id AND a.deleted = 0
+    	WHERE r.recipient_id = #{recipientId:VARCHAR}
+    		AND r.deleted = 0
+	</select>
+			
+	<insert id="insertRecipient" parameterType="Recipient">
+	    INSERT INTO recipient (
+	    	recipient_id
+	    	, delivery_address_id
+	    	, delivery_receipt
+	    	, read_receipt
+	    	, role
+	    	, visibility
+	    )
+	    VALUES(
+	    	#{recipientId:VARCHAR}
+	    	, #{deliveryAddressId:VARCHAR}
+	    	, #{deliveryReceipt:SMALLINT}
+	    	, #{readReceipt:SMALLINT}
+	    	, #{role:VARCHAR}
+	    	, #{visibility:VARCHAR}
+	    	)
+	</insert>
+	
+	<update id="updateRecipient" parameterType="Recipient">
+	    UPDATE recipient
+	    	SET  delivery_address_id = #{deliveryAddressId:VARCHAR}
+	    	, delivery_receipt = #{deliveryReceipt:SMALLINT}
+	    	, read_receipt = #{readReceipt:SMALLINT}
+	    	, role = #{role:VARCHAR}
+	    	, visibility = #{visibility:VARCHAR}
+	    WHERE recipient_id = #{recipientId:VARCHAR}
+	</update>
+	
+	<update id="deleteRecipient" parameterType="java.lang.String">
+	    UPDATE recipient
+	    	SET deleted = 1
+	    WHERE recipient_id = #{recipientId:VARCHAR}
+	</update>
+	
+	<resultMap id="recipientResultMap" type="Recipient">
+		<id property="recipientId" column="r_recipientId" />
+		<result property="deliveryAddressId" column="r_deliveryAddressId" />
+		<result property="readReceipt" column="r_readReceipt" />
+		<result property="role" column="r_role" />
+		<result property="visibility" column="r_visibility" />
+		<association property="deliveryAddress" column="da_deliveryAddressId" javaType="DeliveryAddress"
+			resultMap="org.socraticgrid.hl7.services.uc.db.DeliveryAddress.deliveryAddressResultMap" />
+	</resultMap>
+	
+	<!-- VISIBLE_RECEIVER -->
+	<resultMap id="visR_recipientResultMap" type="Recipient">
+		<id property="recipientId" column="visR_recipientId" />
+		<result property="deliveryAddressId" column="visR_deliveryAddressId" />
+		<result property="readReceipt" column="visR_readReceipt" />
+		<result property="role" column="visR_role" />
+		<result property="visibility" column="visR_visibility" />
+		<association property="deliveryAddress" column="visDa_deliveryAddressId" javaType="DeliveryAddress"
+			resultMap="org.socraticgrid.hl7.services.uc.db.DeliveryAddress.vis_deliveryAddressResultMap" />
+	</resultMap>
+	
+</mapper>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.socraticgrid.hl7.services.uc.db.ProcessingException">
+
+	<select id="selectProcessingExceptionById" parameterType="java.lang.String"
+	    resultType="ProcessingException">
+		SELECT 
+		pe.processing_exception_id AS pe_processingExceptionId
+		, pe.fault AS pe_fault
+		, pe.generating_message_id AS pe_generatingMessage
+		, pe.issuing_service AS pe_issuingService
+		, pe.exception_type AS pe_exceptionType
+		, pe.type_specific_context AS pe_typeSpecificContext
+		FROM processing_exception pe
+    	WHERE pe.processing_exception_id = #{processingExceptionId:VARCHAR}
+    		AND pe.deleted = 0
+	</select>
+	
+	<insert id="insertProcessingException" parameterType="ProcessingException">
+	    INSERT INTO processing_exception 
+	    (
+	    	processing_exception_id
+	    	, fault
+	    	, generating_message_id
+	    	, issuing_service
+	    	, exception_type
+	    	, type_specific_context
+	    )
+	    VALUES
+	    (
+	    	#{processingExceptionId:VARCHAR}
+	    	, #{fault:VARCHAR}
+	    	, #{generatingMessageId:VARCHAR}
+	    	, #{issuingService:VARCHAR}
+	    	, #{exceptionType:VARCHAR}
+	    	, #{typeSpecificContext:VARCHAR}
+	    )
+	</insert>
+	
+	<update id="updateProcessingException" parameterType="MessageBody">
+	    UPDATE processing_exception
+	    	SET fault = #{fault:VARCHAR}
+	    	, generating_message_id = #{generatingMessageId:VARCHAR}
+	    	, issuing_service = #{issuingService:VARCHAR}
+	    	, exception_type = #{exceptionType:VARCHAR}
+	    	, type_specific_context = #{typeSpecificContext:VARCHAR}
+	    WHERE processing_exception_id = #{processingExceptionId:VARCHAR}
+	</update>
+	
+	<update id="deleteProcessingException" parameterType="java.lang.String">
+	    UPDATE processing_exception
+	    	SET deleted = 1
+	    WHERE processing_exception_id = #{processingExceptionId:VARCHAR}
+	</update>
+	
+</mapper>

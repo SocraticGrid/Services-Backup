@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.socraticgrid.hl7.services.uc.db.ConversationChannel">
+
+	<select id="selectConversationChannelById" parameterType="java.lang.String"
+	    resultType="ConversationChannel">
+		SELECT 
+		cc.conversation_channel_id AS conversationChannelId
+		FROM conversation_channel cc
+    	WHERE cc.conversation_id = #{conversationChannelId:VARCHAR}
+    		AND cc.deleted = 0
+	</select>
+	
+	<insert id="insertConversationChannel" parameterType="ConversationChannel">
+	    INSERT INTO conversation_channel (conversation_channel_id)
+	    VALUES( #{conversationChannelId:VARCHAR} )
+	</insert>
+	
+	<update id="updateConversationChannel" parameterType="ConversationChannel">
+	    UPDATE conversation_channel
+	    	SET deleted = deleted
+	    WHERE conversation_channel_id = #{conversationChannelId:VARCHAR}
+	</update>
+	
+	<update id="deleteConversationChannel" parameterType="java.lang.String">
+	    UPDATE conversation_channel
+	    	SET deleted = 1
+	    WHERE conversation_channel_id = #{conversationChannelId:VARCHAR}
+	</update>
+	
+	<resultMap id="conversationChannelResultMap" type="ConversationChannel">
+		<id property="conversationChannelId" column="cc_conversationChannelId" />
+	</resultMap>
+	
+</mapper>

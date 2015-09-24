@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.socraticgrid.hl7.services.uc.db.MessageHeaderAlertStatusJoinDeliveryAddress">
+
+	<insert id="insertMessageHeaderAlertStatusJoin" parameterType="java.util.Map">
+	    INSERT INTO message_header_alert_status_join_delivery_address (message_header_id, delivery_address_id, alert_status)
+	    VALUES( #{messageHeaderId:VARCHAR}, #{deliveryAddressId:VARCHAR}, #{alertStatus:VARCHAR} )
+	</insert>
+	
+	<delete id="deleteMessageHeaderAlertStatusByMessageHeaderId" parameterType="java.lang.String">
+	    DELETE FROM message_header_alert_status_join_delivery_address mhasjda
+	    WHERE mhasjda.message_header_id = #{messageHeaderId:VARCHAR}
+	</delete>
+	
+	<delete id="deleteMessageHeaderAlertStatusByDeliveryAddressId" parameterType="java.lang.String">
+	    DELETE FROM message_header_alert_status_join_delivery_address mhasjda
+	    WHERE mhasjda.delivery_address_id = #{deliveryAddressId:VARCHAR}
+	</delete>
+	
+</mapper>

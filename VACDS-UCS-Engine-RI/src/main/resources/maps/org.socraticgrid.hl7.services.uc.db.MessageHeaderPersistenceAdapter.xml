@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.socraticgrid.hl7.services.uc.db.MessageHeaderPersistenceAdapter">
+
+	<select id="selectMessageHeaderById" parameterType="java.lang.String"
+	    resultMap="messageHeaderSelectResult">
+		SELECT 
+		mh.message_header_id AS mh_messageHeaderId
+		, mh.message_id AS mh_messageId
+		, mh.message_type AS mh_messageType
+		, mh.subject AS mh_subject
+		, mh.related_conversation_id AS mh_relatedConversationId
+		, mh.create_date AS mh_created
+		, mh.last_modified_date AS mh_lastModified
+		, mh.delivery_guarantee AS mh_deliveryGuarantee
+		, mh.dynamics AS mh_dynamics
+		, mh.priority AS mh_priority
+		, mh.receipt_notification AS mh_receiptNotification
+		, mh.retain_fully_in_log AS mh_retainFullyInLog
+		, mh.timeout AS mh_timeout
+		, mh.properties AS mh_properties
+		, mh.related_message_id AS mh_relatedMessageId
+	    , mh.conversation_id AS mh_conversationId
+		, mh.alert_status AS mh_alertStatus
+		, mh.service_response_address AS mh_serviceResponseAddress
+		, mh.request_expires AS mh_requestExpires
+		, mh.reply_allowed AS mh_replyAllowed
+		, senderda.delivery_address_id AS senderda_delivery_address_id
+		, sendera.address_id AS sendera_addressId
+		, sendera.address_type AS sendera_addressType
+		, sendera.address AS sendera_address
+		, sendera.service_id AS sendera_serviceId
+		, sendera.name AS sendera_name
+		, r.recipient_id AS r_recipientId
+		, r.read_receipt AS r_readReceipt
+		, r.role AS r_role
+		, r.visibility AS r_visibility
+		, da.delivery_address_id AS da_deliveryAddressId
+		, a.address_id AS a_addressId
+		, a.address_type AS a_addressType
+		, a.address AS a_address
+		, a.service_id AS a_serviceId
+		, a.name AS a_name
+		, visR.recipient_id AS visR_recipientId
+		, visR.read_receipt AS visR_readReceipt
+		, visR.role AS visR_role
+		, visR.visibility AS visR_visibility
+		, visDa.delivery_address_id AS visDa_deliveryAddressId
+		, visA.address_id AS visA_addressId
+		, visA.address_type AS visA_addressType
+		, visA.address AS visA_address
+		, visA.service_id AS visA_serviceId
+		, visA.name AS visA_name
+		, uci.user_contact_info_id AS uci_userContactInfoId
+		, uci.name AS uci_name
+		, uci.endpoint AS uci_endpoint
+		, ucip.address_id AS ucip_addressId
+		, ucip.address_type AS ucip_addressType
+		, ucip.address AS ucip_address
+		, ucip.service_id AS ucip_serviceId
+		, ucip.name AS ucip_name
+		, COALESCE(ucija.type,'') AS ucija_type
+		, ucia.address_id AS ucia_addressId
+		, ucia.address_type AS ucia_addressType
+		, ucia.address AS ucia_address
+		, ucia.service_id AS ucia_serviceId
+		, ucia.name AS ucia_name
+		, c.conversation_id AS c_conversationId
+		, cc.conversation_channel_id AS cc_conversationChannelId
+		, ucicc.user_contact_info_id AS ucicc_userContactInfoId
+		, ucicc.name AS ucicc_name
+		, ucicc.endpoint AS ucicc_endpoint
+		, uciccp.address_id AS uciccp_addressId
+		, uciccp.address_type AS uciccp_addressType
+		, uciccp.address AS uciccp_address
+		, uciccp.service_id AS uciccp_serviceId
+		, COALESCE(cucija.type,'') AS cucija_type
+		, uciccp.name AS uciccp_name
+		, ucicca.address_id AS ucicca_addressId
+		, ucicca.address_type AS ucicca_addressType
+		, ucicca.address AS ucicca_address
+		, ucicca.service_id AS ucicca_serviceId
+		, ucicca.name AS ucicca_name
+		, participantDa.delivery_address_id AS participantDa_deliveryAddressId
+		, participantA.address_id AS participantA_addressId
+		, participantA.address_type AS participantA_addressType
+		, participantA.address AS participantA_address
+		, participantA.service_id AS participantA_serviceId
+		, participantA.name AS participantA_name
+		
+		FROM message_header mh
+		
+		<!-- SENDER -->
+		LEFT JOIN message_header_join_sender mhjsSender ON mhjsSender.message_header_id = mh.message_header_id
+			AND mhjsSender.deleted = 0
+		LEFT JOIN delivery_address senderda ON senderda.delivery_address_id = mhjsSender.delivery_address_id AND mhjsSender.deleted = 0
+		LEFT JOIN address sendera ON sendera.address_id = senderda.address_id AND sendera.deleted = 0
+		
+		<!-- RECIPIENT -->
+		LEFT JOIN message_header_join_recipient mhjr ON mhjr.message_header_id = mh.message_header_id
+			AND mhjr.deleted = 0 AND mhjr.recipient_type = 'RECIPIENT'
+		LEFT JOIN recipient r ON r.recipient_id = mhjr.recipient_id AND r.deleted = 0
+		LEFT JOIN delivery_address da ON da.delivery_address_id = r.delivery_address_id AND da.deleted = 0
+		LEFT JOIN address a ON a.address_id = da.address_id AND a.deleted = 0
+
+		<!-- REPLY_TO PREFERRED ADDRESS -->
+		LEFT JOIN user_contact_info uci ON uci.user_contact_info_id = mh.reply_to_user_contact_info_id AND uci.deleted = 0
+		LEFT JOIN address ucip ON ucip.address_id = uci.preferred_address_id AND ucip.deleted = 0
+		<!-- REPLY_TO POSSIBLE ADDRESSES -->
+		LEFT JOIN user_contact_info_join_address ucija ON ucija.user_contact_info_id = uci.user_contact_info_id AND ucija.deleted = 0
+		LEFT JOIN address ucia ON ucia.address_id = ucija.address_id AND ucia.deleted = 0
+
+		<!-- VISIBLE_RECEIVER -->
+		LEFT JOIN message_header_join_recipient mhjrVisR ON mhjrVisR.message_header_id = mh.message_header_id
+			AND mhjrVisR.deleted = 0 AND mhjrVisR.recipient_type = 'VISIBLE_RECEIVER'
+		LEFT JOIN recipient visR ON visR.recipient_id = mhjrVisR.recipient_id AND visR.deleted = 0
+		LEFT JOIN delivery_address visDa ON visDa.delivery_address_id = visR.delivery_address_id AND visDa.deleted = 0
+		LEFT JOIN address visA ON visA.address_id = visDa.address_id AND visA.deleted = 0
+
+		<!-- CONVERSATION -->
+		LEFT JOIN conversation c ON c.conversation_id = mh.conversation_id AND c.deleted = 0-->
+		<!-- CONVERSATION CHANNELS -->
+		LEFT JOIN conversation_join_conversation_channel cjcc ON cjcc.conversation_id = c.conversation_id AND cjcc.deleted = 0
+		LEFT JOIN conversation_channel cc ON cc.conversation_channel_id = cjcc.conversation_channel_id AND cc.deleted = 0
+
+		<!-- OWNER -->
+		LEFT JOIN user_contact_info ucicc ON ucicc.user_contact_info_id = c.owner_id AND ucicc.deleted = 0
+		LEFT JOIN address uciccp ON uciccp.address_id = ucicc.preferred_address_id AND uciccp.deleted = 0
+		LEFT JOIN user_contact_info_join_address cucija ON cucija.user_contact_info_id = ucicc.user_contact_info_id
+			AND cucija.deleted = 0
+		LEFT JOIN address ucicca ON ucicca.address_id = cucija.address_id AND ucicca.deleted = 0
+
+		<!-- PARTICIPANTS -->
+		LEFT JOIN conversation_join_participant cjp ON cjp.conversation_id = mh.conversation_id AND cjp.deleted = 0
+		LEFT JOIN delivery_address participantDa ON participantDa.delivery_address_id = cjp.delivery_address_id 
+			AND participantDa.deleted = 0
+		LEFT JOIN address participantA ON participantA.address_id = participantDa.address_id AND participantA.deleted = 0
+		
+    	WHERE mh.message_header_id = #{messageHeaderId:VARCHAR}
+    		AND mh.deleted = 0    	
+	</select>
+
+	<select id="selectMessageHeaderByMsgId" parameterType="java.lang.String"
+	    resultMap="messageHeaderSelectResult">
+		SELECT 
+		mh.message_header_id AS mh_messageHeaderId
+		, mh.message_id AS mh_messageId
+		, mh.message_type AS mh_messageType
+		, mh.subject AS mh_subject
+		, mh.related_conversation_id AS mh_relatedConversationId
+		, mh.create_date AS mh_created
+		, mh.last_modified_date AS mh_lastModified
+		, mh.delivery_guarantee AS mh_deliveryGuarantee
+		, mh.dynamics AS mh_dynamics
+		, mh.priority AS mh_priority
+		, mh.receipt_notification AS mh_receiptNotification
+		, mh.retain_fully_in_log AS mh_retainFullyInLog
+		, mh.timeout AS mh_timeout
+		, mh.properties AS mh_properties
+		, mh.related_message_id AS mh_relatedMessageId
+	    , mh.conversation_id AS mh_conversationId
+		, mh.alert_status AS mh_alertStatus
+		, mh.service_response_address AS mh_serviceResponseAddress
+		, mh.request_expires AS mh_requestExpires
+		, mh.reply_allowed AS mh_replyAllowed
+		, senderda.delivery_address_id AS senderda_delivery_address_id
+		, sendera.address_id AS sendera_addressId
+		, sendera.address_type AS sendera_addressType
+		, sendera.address AS sendera_address
+		, sendera.service_id AS sendera_serviceId
+		, sendera.name AS sendera_name
+		, r.recipient_id AS r_recipientId
+		, r.read_receipt AS r_readReceipt
+		, r.role AS r_role
+		, r.visibility AS r_visibility
+		, da.delivery_address_id AS da_deliveryAddressId
+		, a.address_id AS a_addressId
+		, a.address_type AS a_addressType
+		, a.address AS a_address
+		, a.service_id AS a_serviceId
+		, a.name AS a_name
+		, visR.recipient_id AS visR_recipientId
+		, visR.read_receipt AS visR_readReceipt
+		, visR.role AS visR_role
+		, visR.visibility AS visR_visibility
+		, visDa.delivery_address_id AS visDa_deliveryAddressId
+		, visA.address_id AS visA_addressId
+		, visA.address_type AS visA_addressType
+		, visA.address AS visA_address
+		, visA.service_id AS visA_serviceId
+		, visA.name AS visA_name
+		, uci.user_contact_info_id AS uci_userContactInfoId
+		, uci.name AS uci_name
+		, uci.endpoint AS uci_endpoint
+		, ucip.address_id AS ucip_addressId
+		, ucip.address_type AS ucip_addressType
+		, ucip.address AS ucip_address
+		, ucip.service_id AS ucip_serviceId
+		, ucip.name AS ucip_name
+		, COALESCE(ucija.type,'') AS ucija_type
+		, ucia.address_id AS ucia_addressId
+		, ucia.address_type AS ucia_addressType
+		, ucia.address AS ucia_address
+		, ucia.service_id AS ucia_serviceId
+		, ucia.name AS ucia_name
+		, c.conversation_id AS c_conversationId
+		, cc.conversation_channel_id AS cc_conversationChannelId
+		, ucicc.user_contact_info_id AS ucicc_userContactInfoId
+		, ucicc.name AS ucicc_name
+		, ucicc.endpoint AS ucicc_endpoint
+		, uciccp.address_id AS uciccp_addressId
+		, uciccp.address_type AS uciccp_addressType
+		, uciccp.address AS uciccp_address
+		, uciccp.service_id AS uciccp_serviceId
+		, COALESCE(cucija.type,'') AS cucija_type
+		, uciccp.name AS uciccp_name
+		, ucicca.address_id AS ucicca_addressId
+		, ucicca.address_type AS ucicca_addressType
+		, ucicca.address AS ucicca_address
+		, ucicca.service_id AS ucicca_serviceId
+		, ucicca.name AS ucicca_name
+		, participantDa.delivery_address_id AS participantDa_deliveryAddressId
+		, participantA.address_id AS participantA_addressId
+		, participantA.address_type AS participantA_addressType
+		, participantA.address AS participantA_address
+		, participantA.service_id AS participantA_serviceId
+		, participantA.name AS participantA_name
+		
+		FROM message_header mh
+		<!-- SENDER -->
+		LEFT JOIN message_header_join_sender mhjsSender ON mhjsSender.message_header_id = mh.message_header_id
+			AND mhjsSender.deleted = 0
+		LEFT JOIN delivery_address senderda ON senderda.delivery_address_id = mhjsSender.delivery_address_id AND mhjsSender.deleted = 0
+		LEFT JOIN address sendera ON sendera.address_id = senderda.address_id AND sendera.deleted = 0
+		<!-- RECIPIENT -->
+		LEFT JOIN message_header_join_recipient mhjr ON mhjr.message_header_id = mh.message_header_id
+			AND mhjr.deleted = 0 AND mhjr.recipient_type = 'RECIPIENT'
+		LEFT JOIN recipient r ON r.recipient_id = mhjr.recipient_id AND r.deleted = 0
+		LEFT JOIN delivery_address da ON da.delivery_address_id = r.delivery_address_id AND da.deleted = 0
+		LEFT JOIN address a ON a.address_id = da.address_id AND a.deleted = 0
+
+		<!-- REPLY_TO PREFERRED ADDRESS -->
+		LEFT JOIN user_contact_info uci ON uci.user_contact_info_id = mh.reply_to_user_contact_info_id AND uci.deleted = 0
+		LEFT JOIN address ucip ON ucip.address_id = uci.preferred_address_id AND ucip.deleted = 0
+		<!-- REPLY_TO POSSIBLE ADDRESSES -->
+		LEFT JOIN user_contact_info_join_address ucija ON ucija.user_contact_info_id = uci.user_contact_info_id AND ucija.deleted = 0
+		LEFT JOIN address ucia ON ucia.address_id = ucija.address_id AND ucia.deleted = 0
+
+		<!-- VISIBLE_RECEIVER -->
+		LEFT JOIN message_header_join_recipient mhjrVisR ON mhjrVisR.message_header_id = mh.message_header_id
+			AND mhjrVisR.deleted = 0 AND mhjrVisR.recipient_type = 'VISIBLE_RECEIVER'
+		LEFT JOIN recipient visR ON visR.recipient_id = mhjrVisR.recipient_id AND visR.deleted = 0
+		LEFT JOIN delivery_address visDa ON visDa.delivery_address_id = visR.delivery_address_id AND visDa.deleted = 0
+		LEFT JOIN address visA ON visA.address_id = visDa.address_id AND visA.deleted = 0
+
+		<!-- CONVERSATION -->
+		LEFT JOIN conversation c ON c.conversation_id = mh.conversation_id AND c.deleted = 0-->
+		<!-- CONVERSATION CHANNELS -->
+		LEFT JOIN conversation_join_conversation_channel cjcc ON cjcc.conversation_id = c.conversation_id AND cjcc.deleted = 0
+		LEFT JOIN conversation_channel cc ON cc.conversation_channel_id = cjcc.conversation_channel_id AND cc.deleted = 0
+
+		<!-- OWNER -->
+		LEFT JOIN user_contact_info ucicc ON ucicc.user_contact_info_id = c.owner_id AND ucicc.deleted = 0
+		LEFT JOIN address uciccp ON uciccp.address_id = ucicc.preferred_address_id AND uciccp.deleted = 0
+		LEFT JOIN user_contact_info_join_address cucija ON cucija.user_contact_info_id = ucicc.user_contact_info_id
+			AND cucija.deleted = 0
+		LEFT JOIN address ucicca ON ucicca.address_id = cucija.address_id AND ucicca.deleted = 0
+
+		<!-- PARTICIPANTS -->
+		LEFT JOIN conversation_join_participant cjp ON cjp.conversation_id = mh.conversation_id AND cjp.deleted = 0
+		LEFT JOIN delivery_address participantDa ON participantDa.delivery_address_id = cjp.delivery_address_id 
+			AND participantDa.deleted = 0
+		LEFT JOIN address participantA ON participantA.address_id = participantDa.address_id AND participantA.deleted = 0
+		
+    	WHERE mh.message_id = #{messageId:VARCHAR}
+    		AND mh.deleted = 0    	
+	</select>
+	
+	<insert id="insertMessageHeader" parameterType="MessageHeaderPersistenceAdapter">
+	    INSERT INTO message_header 
+	    (
+			message_header_id
+			, message_id
+			, message_type
+			, subject
+			, related_conversation_id
+			, create_date
+			, last_modified_date
+			, delivery_guarantee
+			, dynamics
+			, priority
+			, receipt_notification
+			, retain_fully_in_log
+			, timeout
+			, properties
+			, related_message_id
+			, reply_to_user_contact_info_id
+			, conversation_id
+			, alert_status
+			, service_response_address
+			, request_expires
+			, reply_allowed
+	    )
+	    VALUES(
+	    	#{messageHeaderId:VARCHAR}
+	    	, #{messageId:VARCHAR}
+	    	, #{messageType:VARCHAR}
+	    	, #{subject:VARCHAR}
+	    	, #{relatedConversationId:VARCHAR}
+	    	, #{created:TIMESTAMP}
+	    	, #{lastModified:TIMESTAMP}
+	    	, #{deliveryGuarantee:VARCHAR}
+	    	, #{dynamics:VARCHAR}
+	    	, #{priority:SMALLINT}
+	    	, #{receiptNotification:SMALLINT}
+	    	, #{retainFullyInLog:SMALLINT}
+	    	, #{timeout:INTEGER}
+	    	, #{properties:VARCHAR}
+	    	, #{relatedMessageId:VARCHAR}
+	    	, #{replyToUserContactInfoId:VARCHAR}
+			, #{conversationId:VARCHAR}
+			, #{alertStatus:VARCHAR}
+			, #{serviceResponseAddress:VARCHAR}
+			, #{requestExpires:TIMESTAMP}
+			, #{replyAllowed:VARCHAR}
+	    	
+	    )
+	</insert>
+	
+	<update id="updateMessageHeader" parameterType="MessageHeaderPersistenceAdapter">
+	    UPDATE message_header
+	    	SET message_id = #{messageId:VARCHAR} 
+	    	, message_type = #{messageType:VARCHAR}
+	      	, subject = #{subject:VARCHAR}
+	    	, related_conversation_id = #{relatedConversationId:VARCHAR}
+	    	, create_date = #{created:TIMESTAMP}
+	    	, last_modified_date = #{lastModified:TIMESTAMP}
+	    	, delivery_guarantee = #{deliveryGuarantee:VARCHAR}
+	    	, dynamics = #{dynamics:VARCHAR}
+	    	, priority = #{priority:SMALLINT}
+	    	, receipt_notification = #{receiptNotification:SMALLINT}
+	    	, retain_fully_in_log = #{retainFullyInLog:SMALLINT}
+	    	, timeout = #{timeout:INTEGER}
+	    	, properties = #{properties:VARCHAR}
+	    	, related_message_id = #{relatedMessageId:VARCHAR}
+	    	, reply_to_user_contact_info_id = #{replyToUserContactInfoId:VARCHAR}
+	    	, conversation_id = #{conversationId:VARCHAR}
+			, alert_status = #{alertStatus:VARCHAR}
+			, service_response_address = #{serviceResponseAddress:VARCHAR}
+			, request_expires = #{requestExpires:TIMESTAMP}
+			, reply_allowed = #{replyAllowed:VARCHAR}
+	    WHERE message_header_id = #{messageHeaderId:VARCHAR}
+	    	AND deleted = 0
+	</update>
+	
+	<update id="deleteMessageHeader" parameterType="java.lang.String">
+	    UPDATE message_header
+	    	SET deleted = 1
+	    WHERE message_header_id = #{messageHeaderId:VARCHAR}
+	</update>
+	
+	<resultMap id="messageHeaderSelectResult" type="MessageHeaderPersistenceAdapter">
+		<id property="messageHeaderId" column="mh_message_header_id" />
+		<result property="messageHeaderId" column="mh_messageHeaderId" />
+		<result property="messageId" column="mh_messageId" />
+		<result property="timeout" column="mh_timeout" />
+		<result property="messageType" column="mh_messageType" />
+		<result property="subject" column="mh_subject" />
+		<result property="relatedConversationId" column="mh_relatedConversationId" />
+		<result property="created" column="mh_created" />
+		<result property="lastModified" column="mh_lastModified" />
+		<result property="deliveryGuarantee" column="mh_deliveryGuarantee" />
+		<result property="dynamics" column="mh_dynamics" />
+		<result property="priority" column="mh_priority" />
+		<result property="receiptNotification" column="mh_receiptNotification" />
+		<result property="retainFullyInLog" column="mh_retainFullyInLog" />
+		<result property="properties" column="mh_properties" />
+		<result property="relatedMessageId" column="mh_relatedMessageId" />
+	    <result property="conversationId" column="mh_conversationId" />
+		<result property="alertStatus" column="mh_alertStatus" />
+		<result property="serviceResponseAddress" column="mh_serviceResponseAddress" />
+		<result property="requestExpires" column="mh_requestExpires" />
+		<result property="replyAllowed" column="mh_replyAllowed" />
+		<association property="sender" column="senderda_delivery_address_id" javaType="DeliveryAddress" resultMap="org.socraticgrid.hl7.services.uc.db.DeliveryAddress.sender_deliveryAddressResultMap" />
+		<association property="replyTo" column="uci_userContactInfoId" javaType="UserContactInfoDelegate"
+			resultMap="org.socraticgrid.hl7.services.uc.db.UserContactInfo.userContactInfoResultMap" />
+		<!-- The following code needs to be reexamined - it is for a join to conversation and currently
+			returns a new conversation for each row - not desireable. 
+		association property="conversation" column="c_conversationId" javaType="Conversation"	
+			resultMap="org.socraticgrid.hl7.services.uc.db.Conversation.conversationResultMap" /-->
+		<association property="conversation" column="mh_conversationId" javaType="Conversation"
+			select="org.socraticgrid.hl7.services.uc.db.Conversation.selectConversationById" />
+		<collection property="recipientsList" ofType="Recipient" resultMap="org.socraticgrid.hl7.services.uc.db.Recipient.recipientResultMap" />
+		<collection property="visibleReceivers" ofType="Recipient" resultMap="org.socraticgrid.hl7.services.uc.db.Recipient.visR_recipientResultMap" />
+		<collection property="statusByReceiverDelegate" column="mh_messageHeaderId" ofType="StatusByReceiverDelegate" select="selectStatusByReceiverDelegateSelect" />
+	</resultMap>
+	
+	
+	<select id="selectStatusByReceiverDelegateSelect" parameterType="java.lang.String"
+	    resultMap="statusByReceiverDelegateMap">
+		SELECT mhasjda.delivery_address_id AS mhasjda_deliveryAddressId
+		, mhasjda.alert_status AS mhasjda_alertStatus
+		, mhasjdaDaA.address_id AS mhasjdaDaA_addressId
+		, mhasjdaDaA.address_type AS mhasjdaDaA_addressType
+		, mhasjdaDaA.address AS mhasjdaDaA_address
+		, mhasjdaDaA.service_id AS mhasjdaDaA_serviceId
+		, mhasjdaDaA.name AS mhasjdaDaA_name
+		
+		FROM  message_header_alert_status_join_delivery_address mhasjda
+		LEFT JOIN delivery_address mhasjdaDa ON mhasjda.delivery_address_id = mhasjdaDa.delivery_address_id AND mhasjdaDa.deleted = 0
+		LEFT JOIN address mhasjdaDaA ON mhasjdaDaA.address_id = mhasjdaDa.address_id AND mhasjdaDaA.deleted = 0
+		
+    	WHERE mhasjda.message_header_id = #{messageHeaderId:VARCHAR}
+    		AND mhasjda.deleted = 0    	
+	</select>
+	
+	<resultMap id="statusByReceiverDelegateMap" type="StatusByReceiverDelegate">
+		<id property="key" column="mhasjda_deliveryAddressId" />
+		<result property="alertStatus" column="mhasjda_alertStatus" />
+		<association property="deliveryAddress" column="mhasjda_deliveryAddressId" javaType="DeliveryAddress" >
+			<id property="deliveryAddressId" column="mhasjda_deliveryAddressId" />
+			<association property="addressAdapter" column="mhasjdaDaA_addressId" javaType="AddressPersistenceAdapter" >
+				<id property="addressId" column="mhasjdaDaA_addressId" />
+				<result property="addressType" column="mhasjdaDaA_addressType" />
+				<result property="serviceId" column="mhasjdaDaA_serviceId" />
+				<result property="address" column="mhasjdaDaA_address" />
+				<result property="name" column="mhasjdaDaA_name" />
+			</association>
+		</association>
+	</resultMap>
+	
+</mapper>

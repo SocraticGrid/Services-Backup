@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+	<context:annotation-config />
+
+
+	<bean id="TestClientServive" name="TestClientServive"
+		class="org.socraticgrid.hl7.services.uc.service.impl.ClientServiceImpl">
+	</bean>
+	<bean id="DeliveryManager" name="DeliveryManager"
+		class="org.socraticgrid.hl7.services.uc.functional.DeliveryManager">
+	</bean>
+	<bean id="ServiceRegistery" name="ServiceRegistery"
+		class="org.socraticgrid.hl7.services.uc.functional.ServiceRegistry">
+	</bean>
+
+	<bean class="org.socraticgrid.hl7.services.uc.functional.MessageIdGenerator"
+		id="MessageIdGenerator" scope="singleton">
+		<property name="generator">
+			<bean
+				class="org.socraticgrid.hl7.services.uc.internal.idgenerators.TimeBasedIdGenerator" />
+		</property>
+	</bean>
+
+	<bean id="MessageManager" name="MessageManager"
+		class="org.socraticgrid.hl7.services.uc.functional.MessageManager">
+	</bean>
+
+	<bean id="UserManager" name="UserManager"
+		class="org.socraticgrid.hl7.services.uc.functional.UserManager">
+	</bean>
+
+
+	<bean id="MainValidator"
+		class="org.socraticgrid.hl7.services.uc.functional.MessageValidator"
+		autowire-candidate="true" lazy-init="false" scope="singleton">
+		<property name="commonValidationSteps">
+			<list>
+				<bean
+					class="org.socraticgrid.hl7.services.uc.internal.validators.CommonHeader" />
+			</list>
+		</property>
+		<property name="typeSpecificValidators">
+			<map>
+				<entry key="SimpleMessage">
+					<list>
+						<bean
+							class="org.socraticgrid.hl7.services.uc.internal.validators.SimpleMessageCompleteness"></bean>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+
+	<bean id="EventLogger" name="EventLogger"
+		class="org.socraticgrid.hl7.services.uc.functional.EventLogger">
+	</bean>
+
+
+	<bean id="ConversationManager" name="ConversationManager"
+		class="org.socraticgrid.hl7.services.uc.functional.ConversationManager">
+	</bean>
+
+
+	<bean id="GroupManager" name="GroupManager"
+		class="org.socraticgrid.hl7.services.uc.functional.GroupManager">
+	</bean>
+
+	<bean id="AddressResolver" name="AddressResolver"
+		class="org.socraticgrid.hl7.services.uc.functional.AddressResolver">
+	</bean>
+</beans>

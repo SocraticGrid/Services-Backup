@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:lang="http://www.springframework.org/schema/lang"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-3.2.xsd
+		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-3.2.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd">
+	<bean id="MainValidator"
+		class="org.socraticgrid.hl7.services.orders.functional.OrderValidator"
+		autowire-candidate="true" lazy-init="false" scope="singleton">
+		<property name="commonValidationSteps">
+		<list>
+			<bean class="org.socraticgrid.hl7.services.orders.internal.validators.CommonStructure"/>
+			<bean class="org.socraticgrid.hl7.services.orders.internal.validators.OrderCompleteness"/>
+		</list>
+		</property>
+		<property name="typeSpecificValidators">
+			<map>
+				<entry key="LabOrder">
+					<list>
+						<bean class="org.socraticgrid.hl7.services.orders.internal.validators.LabOrderStructure"></bean></list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+</beans>

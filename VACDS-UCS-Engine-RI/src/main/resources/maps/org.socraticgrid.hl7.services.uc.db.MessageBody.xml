@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.socraticgrid.hl7.services.uc.db.MessageBody">
+
+	<select id="selectMessageBodyById" parameterType="java.lang.String"
+	    resultType="MessageBody">
+		SELECT 
+		m.message_body_id AS messageBodyId
+		, m.content AS content
+		, m.tag AS tag
+		, m.type AS type
+		FROM message_body m
+    	WHERE m.message_body_id = #{messageBodyId:VARCHAR}
+    		AND m.deleted = 0
+	</select>
+	
+	<insert id="insertMessageBody" parameterType="MessageBody">
+	    INSERT INTO message_body (message_body_id, content, tag, type)
+	    VALUES(#{messageBodyId:VARCHAR}, #{content:CLOB}, #{tag:VARCHAR}, #{type:VARCHAR})
+	</insert>
+	
+	<update id="updateMessageBody" parameterType="MessageBody">
+	    UPDATE message_body
+	    	SET content = #{content:CLOB}
+	    	, tag = #{tag:VARCHAR}
+	    	, type = #{type:VARCHAR}
+	    WHERE message_body_id = #{messageBodyId:VARCHAR}
+	</update>
+	
+	<update id="deleteMessageBody" parameterType="java.lang.String">
+	    UPDATE message_body
+	    	SET deleted = 1
+	    WHERE message_body_id = #{messageBodyId:VARCHAR}
+	</update>
+	
+</mapper>

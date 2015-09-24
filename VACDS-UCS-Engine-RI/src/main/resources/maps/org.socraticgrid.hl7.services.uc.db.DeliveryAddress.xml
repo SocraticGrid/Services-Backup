@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.socraticgrid.hl7.services.uc.db.DeliveryAddress">
+
+	<select id="selectDeliveryAddressById" parameterType="java.lang.String"
+	    resultMap="deliveryAddressResultMap">
+		SELECT 
+		da.delivery_address_id AS da_deliveryAddressId
+		, a.address_id AS a_addressId
+		, a.address_type AS a_addressType
+		, a.address AS a_address
+		, a.service_id AS a_serviceId
+		, a.name AS a_name
+		FROM delivery_address da
+		LEFT  JOIN address a ON a.address_id = da.address_id AND a.deleted = 0
+    	WHERE da.delivery_address_id = #{deliveryAddressId:VARCHAR}
+    		AND da.deleted = 0
+	</select>
+	
+	<insert id="insertDeliveryAddress" parameterType="DeliveryAddress">
+	    INSERT INTO delivery_address (
+	    	delivery_address_id
+	    	, address_id
+	    )
+	    VALUES(
+	    	#{deliveryAddressId:VARCHAR}
+	    	, #{addressId:VARCHAR}
+	    	)
+	</insert>
+	
+	<update id="updateDeliveryAddress" parameterType="DeliveryAddress">
+	    UPDATE delivery_address
+	    	SET address_id = #{addressId:VARCHAR}
+	    WHERE delivery_address_id = #{deliveryAddressId:VARCHAR}
+	</update>
+	
+	<update id="deleteDeliveryAddress" parameterType="java.lang.String">
+	    UPDATE delivery_address
+	    	SET deleted = 1
+	    WHERE delivery_address_id = #{deliveryAddressId:VARCHAR}
+	</update>
+	
+	<resultMap id="deliveryAddressResultMap" type="DeliveryAddress">
+		<id property="deliveryAddressId" column="da_deliveryAddressId" />
+		<result property="addressId" column="da_addressId" />
+		<association property="addressAdapter" column="a_addressId" javaType="AddressPersistenceAdapter"
+			resultMap="org.socraticgrid.hl7.services.uc.db.AddressPersistenceAdapter.addressResultMap" />
+	</resultMap>
+	
+		
+	<resultMap id="sender_deliveryAddressResultMap" type="DeliveryAddress">
+		<id property="deliveryAddressId" column="senderda_delivery_address_id" />
+		<result property="addressId" column="senderda_addressId" />
+		<association property="addressAdapter" column="sendera_addressId" javaType="AddressPersistenceAdapter"
+			resultMap="org.socraticgrid.hl7.services.uc.db.AddressPersistenceAdapter.senderAddressResultMap" />
+	</resultMap>
+	
+		
+	<resultMap id="vis_deliveryAddressResultMap" type="DeliveryAddress">
+		<id property="deliveryAddressId" column="visDa_deliveryAddressId" />
+		<result property="addressId" column="visDa_addressId" />
+		<association property="addressAdapter" column="visA_addressId" javaType="AddressPersistenceAdapter"
+			resultMap="org.socraticgrid.hl7.services.uc.db.AddressPersistenceAdapter.vis_addressResultMap" />
+	</resultMap>
+
+	<!-- ******************************** Conversation Participants variant -->
+	<!-- The following resulMap is used exclusively by Conversation
+		and are kept here so all address resultMaps have the same origin -->
+	<resultMap id="convP_deliveryAddressResultMap" type="DeliveryAddress">
+		<id property="deliveryAddressId" column="participantDa_deliveryAddressId" />
+		<result property="addressId" column="participantDa_addressId" />
+		<association property="addressAdapter" column="participantA_addressId" javaType="AddressPersistenceAdapter"
+			resultMap="org.socraticgrid.hl7.services.uc.db.AddressPersistenceAdapter.convP_addressResultMap" />
+	</resultMap>
+	<!-- ******************************** -->
+	
+</mapper>

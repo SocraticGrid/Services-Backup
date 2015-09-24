@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean class="org.socraticgrid.hl7.services.eps.internal.model.TransientTopic"
+		name="rootTopic" id="rootTopic">
+		<property name="subTopics">
+			<map>
+				<entry key="Test Topic">
+					<ref bean="TestTopicBean" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean name="TestTopicBean" id="TestTopicBean"
+		class="org.socraticgrid.hl7.services.eps.internal.model.TransientTopic">
+		<property name="parentTopic" ref="rootTopic" />
+		<property name="topic">
+			<bean class="org.socraticgrid.hl7.services.eps.model.Topic">
+				<property name="name" value="Test Topic" />
+				<property name="optionsList">
+					<bean class="org.socraticgrid.hl7.services.eps.model.Options">
+						<property name="access" value="Open"></property>
+						<property name="durability" value="Transient"></property>
+					</bean>
+				</property>
+			</bean>
+
+		</property>
+
+		<property name="subTopics">
+			<map>
+				<entry key="Test SubTopic">
+					<ref bean="TestSubTopicBean" />
+				</entry>
+			</map>
+		</property>
+		
+		<property name="subscriptions">
+			<list>
+				<ref bean="Server68Subscription" />
+			</list>
+		</property>
+	</bean>
+
+	<bean name="TestSubTopicBean" id="TestSubTopicBean"
+		class="org.socraticgrid.hl7.services.eps.internal.model.TransientTopic">
+		<property name="parentTopic" ref="rootTopic" />
+		<property name="topic">
+			<bean class="org.socraticgrid.hl7.services.eps.model.Topic">
+				<property name="name" value="SubTopic" />
+				<property name="optionsList">
+					<bean class="org.socraticgrid.hl7.services.eps.model.Options">
+						<property name="access" value="Open"></property>
+						<property name="durability" value="Transient"></property>
+					</bean>
+				</property>
+
+			</bean>
+		</property>
+
+
+		<property name="subscriptions">
+			<list>
+				<ref bean="Server68Subscription" />
+			</list>
+		</property>
+	</bean>
+
+</beans>

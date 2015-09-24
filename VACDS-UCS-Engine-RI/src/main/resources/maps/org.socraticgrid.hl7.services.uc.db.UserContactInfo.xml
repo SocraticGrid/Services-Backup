@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.socraticgrid.hl7.services.uc.db.UserContactInfo">
+
+	<select id="selectUserContactInfoById" parameterType="java.lang.String"
+	    resultMap="userContactInfoResultMap">
+		SELECT 
+		uci.user_contact_info_id AS uci_userContactInfoId
+		, uci.name AS uci_name
+		, uci.endpoint AS uci_endpoint
+		, ucip.address_id AS ucip_addressId
+		, ucip.address AS ucip_address
+		, ucip.service_id AS ucip_serviceId
+		, ucip.name AS ucip_name
+		, ucia.address_id AS ucia_addressId
+		, ucia.address AS ucia_address
+		, ucia.service_id AS ucia_serviceId
+		, COALESCE(ucija.type,'') AS ucija_type
+		FROM user_contact_info uci
+		LEFT JOIN address ucip ON ucip.address_id = uci.preferred_address_id AND ucip.deleted = 0
+		LEFT JOIN user_contact_info_join_address ucija ON ucija.user_contact_info_id = uci.user_contact_info_id
+			AND ucija.deleted = 0
+		LEFT JOIN address ucia ON ucia.address_id = ucija.address_id AND ucia.deleted = 0
+    	WHERE uci.user_contact_info_id = #{userContactInfoId:VARCHAR}
+    		AND uci.deleted = 0
+	</select>
+	
+	<insert id="insertUserContactInfo" parameterType="UserContactInfo">
+	    INSERT INTO user_contact_info 
+	    (
+	    	user_contact_info_id
+	    	, name
+	    	, endpoint
+	    	, preferred_address_id	
+		)
+	    VALUES
+	    (
+	    	#{userContactInfoId:VARCHAR}
+	    	, #{name:VARCHAR}
+	    	, #{endpoint:VARCHAR}
+	    	, #{preferredAddressId:VARCHAR}
+	    )
+	</insert>
+	
+	<update id="updateUserContactInfo" parameterType="UserContactInfo">
+	    UPDATE user_contact_info
+	    	SET name = #{name:VARCHAR} 
+	    	, endpoint = #{endpoint:VARCHAR}
+	    	, preferred_address_id = #{preferredAddressId:VARCHAR}
+	    WHERE user_contact_info_id = #{userContactInfoId:VARCHAR}
+	</update>
+	
+	<update id="deleteUserContactInfo" parameterType="java.lang.String">
+	    UPDATE user_contact_info
+	    	SET deleted = 1
+	    WHERE address_id = #{addressId:VARCHAR}
+	</update>
+	
+	<resultMap id="userContactInfoResultMap" type="UserContactInfoDelegate">
+		<id property="userContactInfoId" column="uci_userContactInfoId" />
+		<result property="name" column="uci_name" />
+		<result property="endpoint" column="uci_endpoint" />
+		<association property="preferredAddress" column="ucip_addressId" javaType="PhysicalAddress" >
+			<id property="addressId" column="ucip_addressId" />
+			<result property="serviceId" column="ucip_serviceId" />
+			<result property="address" column="ucip_address" />
+			<result property="name" column="ucip_name" />
+		</association>
+		<collection property="addresses" ofType="PhysicalAddress" javaType="java.util.LinkedList" >
+			<id property="addressId" column="ucia_addressId" />
+			<result property="serviceId" column="ucia_serviceId" />
+			<result property="address" column="ucia_address" />
+		</collection>
+		<collection property="types" ofType="String" javaType="java.util.LinkedList" >
+			<id property="type" column="ucija_type" />
+		</collection>
+	</resultMap>
+	
+	<resultMap id="conv_userContactInfoResultMap" type="UserContactInfoDelegate">
+		<id property="userContactInfoId" column="ucicc_userContactInfoId" />
+		<result property="name" column="ucicc_name" />
+		<result property="endpoint" column="ucicc_endpoint" />
+		<association property="preferredAddress" column="uciccp_addressId" javaType="PhysicalAddress"
+			resultMap="org.socraticgrid.hl7.services.uc.db.AddressPersistenceAdapter.conv_ucipAddressResultMap" />
+		<collection property="addresses" ofType="PhysicalAddress" 
+		resultMap="org.socraticgrid.hl7.services.uc.db.AddressPersistenceAdapter.conv_uciaAddressResultMap" />
+		<collection property="types" ofType="String" javaType="java.util.LinkedList" >
+			<id property="type" column="cucija_type" />
+		</collection>
+	</resultMap>
+
+	
+</mapper>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.socraticgrid.hl7.services.uc.db.MessageJoinProcessingException">
+
+	<insert id="insertMessageJoinProcessingException" parameterType="java.util.Map">
+	    INSERT INTO message_join_processing_exception (message_id, processing_exception_id)
+	    VALUES( #{messageId:VARCHAR}, #{processingExceptionId:VARCHAR} )
+	</insert>
+	
+	<delete id="deleteMessageJoinProcessingExceptionForMessageId" parameterType="java.lang.String">
+	    DELETE FROM message_join_message_body mjmb
+	    WHERE mjmb.message_id = #{messageId:VARCHAR}
+	</delete>
+	
+</mapper>

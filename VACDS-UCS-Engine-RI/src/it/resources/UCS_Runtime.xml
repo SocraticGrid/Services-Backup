@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+	<bean id="StandardConfig" name="StandardConfig"
+		class="org.socraticgrid.spring.tools.configuration.ConfigurationTaskQueue">
+		<property name="items">
+			<list>
+				<bean
+					class="org.socraticgrid.spring.tools.configuration.PropertyAssignmentTask">
+					<property name="beanName" value="SMSAdapter"></property>
+					<property name="property" value="endPoint" />
+					<!-- property name="value" value="http://localhost:8080/smsservice" /-->
+					<!-- property name="value" value="http://172.31.5.72:8080/KMFUCSAdapterService/smsservice" /-->
+							<!-- Test endpoint -->
+					<property name="value" value="http://localhost:8081/KMFUCSAdapterService/smsservice" />
+				</bean>
+				<bean
+					class="org.socraticgrid.spring.tools.configuration.PropertyAssignmentTask">
+					<property name="beanName" value="TTVAdapter"></property>
+					<property name="property" value="endPoint" />
+					<!-- property name="value" value="http://localhost:8080/ttvservice" /-->
+					<!-- property name="value" value="http://172.31.5.72:8080/KMFUCSAdapterService/ttvservice" /-->
+							<!-- Test endpoint -->
+					<property name="value" value="http://localhost:8081/KMFUCSAdapterService/ttvservice" />
+				</bean>
+				<bean
+					class="org.socraticgrid.spring.tools.configuration.PropertyAssignmentTask">
+					<property name="beanName" value="ClientRegistry"/>
+					<property name="property" value="clientEndpointMap" />
+					<property name="value">
+						<map>
+							<!-- Development endpoint -->
+							<entry key="CDS_UCS" value="http://172.31.5.68:8080/KMFEPSSubscriber/ucsclient"/>
+							<!-- Test endpoint -->
+							<entry key="testCDS_UCS" value="http://localhost:8081/KMFEPSSubscriber/ucsclient"/>
+						</map>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+	
+	
+</beans>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.socraticgrid.hl7.services.uc.db.ConversationJoinConversationChannel">
+
+	<insert id="insertConversationJoinConversationChannel" parameterType="java.util.Map">
+	    INSERT INTO conversation_join_conversation_channel (conversation_id, conversation_channel_id)
+	    VALUES(#{conversationId:VARCHAR}, #{conversationChannelId:VARCHAR})
+	</insert>
+	
+	<delete id="deleteForConversationIdConversationChannelJoin" parameterType="java.lang.String">
+	    DELETE FROM conversation_join_conversation_channel cjcc
+	    WHERE cjcc.conversation_id = #{conversationId:VARCHAR}
+	</delete>
+	
+	<delete id="deleteForConversationChannelIdConversationChannelJoin" parameterType="java.lang.String">
+	    DELETE FROM conversation_join_conversation_channel cjcc
+	    WHERE cjcc.conversation_channel_id = #{conversationChannelId:VARCHAR}
+	</delete>
+	
+</mapper>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.socraticgrid.hl7.services.uc.db.MessageHeaderJoinRecipient">
+
+	<insert id="insertMessageHeaderJoinRecipient" parameterType="java.util.Map">
+	    INSERT INTO message_header_join_recipient (message_header_id, recipient_id, recipient_type)
+	    VALUES( #{messageHeaderId:VARCHAR}, #{recipientId:VARCHAR}, #{recipientType:VARCHAR} )
+	</insert>
+	
+	<delete id="deleteMessageHeaderJoinRecipientAndReceiverByMessageHeaderId" parameterType="java.lang.String">
+	    DELETE FROM message_header_join_recipient mhjr
+	    WHERE mhjr.message_header_id = #{messageHeaderId:VARCHAR}
+	</delete>
+	
+	<delete id="deleteForMessageHeaderIdAndRecipientType" parameterType="java.util.Map">
+	    DELETE FROM message_header_join_recipient mhjr
+	    WHERE mhjr.message_header_id = #{messageHeaderId:VARCHAR}
+	    	AND mhjr.recipient_type = #{recipientType:VARCHAR}
+	</delete>
+	
+	<delete id="deleteForRecipientId" parameterType="java.lang.String">
+	    DELETE FROM message_header_join_recipient
+	    WHERE message_header_join_recipient.recipient_id = #{recipientId:VARCHAR}
+	</delete>
+	
+	<delete id="deleteForRecipientIdAndType" parameterType="java.util.Map">
+	    DELETE FROM message_header_join_recipient
+	    WHERE message_header_join_recipient.recipient_id = #{recipientId:VARCHAR}
+	    	AND message_header_join_recipient.recipient_type = #{recipientType:VARCHAR}
+	</delete>
+	
+</mapper>

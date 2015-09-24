@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.socraticgrid.hl7.services.uc.db.Message">
+
+	<select id="selectMessageBodyAndExceptionsByMessageId" parameterType="java.lang.String"
+		resultMap="selectMessageBodyAndExceptionsByMessageIdMap">
+		SELECT
+		mjmb.message_id AS mhjmb_messageId 
+		, mb.message_body_id AS mb_messageBodyId
+		, mb.content AS mb_content
+		, mb.tag AS mb_tag
+		, mb.type AS mb_type
+		, pe.processing_exception_id AS pe_processingExceptionId
+		, pe.fault AS pe_fault
+		, pe.generating_message_id AS pe_generatingMessageId
+		, pe.issuing_service AS pe_issuingService
+		, pe.exception_type AS pe_exceptionType
+		, pe.type_specific_context AS pe_typeSpecificContext
+		FROM message_join_message_body mjmb
+		LEFT JOIN message_body mb ON mb.message_body_id = mjmb.message_body_id AND mb.deleted = 0
+		LEFT JOIN message_join_processing_exception mjpe ON mjpe.message_id = mjmb.message_id
+			AND mjpe.deleted = 0
+		LEFT JOIN processing_exception pe ON pe.processing_exception_id = mjpe.processing_exception_id AND pe.deleted = 0
+    	WHERE mjmb.message_id = #{messageId:VARCHAR}
+    		AND mjmb.deleted = 0
+	</select>
+	
+	<resultMap id="selectMessageBodyAndExceptionsByMessageIdMap" type="MessageBodyExceptionsDelegate">
+		<id property="uid" column="mjmb_messageId" />
+		<collection property="parts" ofType="MessageBody" >
+			<id property="messageBodyId" column="mb_messageBodyId" />
+			<result property="content" column="mb_content"/>
+			<result property="tag" column="mb_tag"/>
+			<result property="type" column="mb_type"/>
+		</collection>
+		<collection property="exceptions" ofType="ProcessingException" >
+			<id property="processingExceptionId" column="pe_processingExceptionId" />
+			<result property="fault" column="pe_fault"/>
+			<result property="generatingMessageId" column="pe_generatingMessageId"/>
+			<result property="exceptionType" column="pe_exceptionType"/>
+			<result property="typeSpecificContext" column="pe_typeSpecificContext"/>
+		</collection>
+	</resultMap>
+	
+</mapper>
